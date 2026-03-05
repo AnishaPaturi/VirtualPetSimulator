@@ -1,8 +1,5 @@
+import pet.*;
 import java.util.Scanner;
-
-import pet.Cat;
-import pet.Dog;
-import pet.Pet;
 
 public class Main {
 
@@ -10,30 +7,25 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Enter Owner Name:");
-        String ownerName = scanner.nextLine();
-
-        System.out.println("Choose Pet Type:");
-        System.out.println("1. Dog");
-        System.out.println("2. Cat");
+        System.out.println("Choose Pet:");
+        System.out.println("1 Dog");
+        System.out.println("2 Cat");
 
         int choice = scanner.nextInt();
         scanner.nextLine();
 
-        System.out.println("Enter Pet Name:");
-        String petName = scanner.nextLine();
+        System.out.println("Enter pet name:");
+        String name = scanner.nextLine();
 
         Pet pet;
 
-        if (choice == 1) {
-            pet = new Dog(petName);
-        } else {
-            pet = new Cat(petName);
-        }
+        if (choice == 1)
+            pet = new Dog(name);
+        else
+            pet = new Cat(name);
 
-        Owner owner = new Owner(ownerName, pet);
+        GameManager game = new GameManager(pet);
 
-        GameManager game = new GameManager(owner);
-        game.startGame();
+        game.start();
     }
 }

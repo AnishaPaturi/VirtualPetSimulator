@@ -1,62 +1,83 @@
-import java.util.Scanner;
+import pet.*;
+import battle.BattleSystem;
+import inventory.Inventory;
 
-import items.Food;
+import java.util.Random;
+import java.util.Scanner;
 
 public class GameManager {
 
-    private Owner owner;
+    private Pet pet;
+    private Inventory inventory;
     private Scanner scanner;
+    private Random random;
 
-    public GameManager(Owner owner) {
-        this.owner = owner;
-        scanner = new Scanner(System.in);
+    public GameManager(Pet pet) {
+        this.pet = pet;
+        this.inventory = new Inventory();
+        this.scanner = new Scanner(System.in);
+        this.random = new Random();
     }
 
-    public void startGame() {
+    public void start() {
 
         while (true) {
 
-            System.out.println("\n===== Virtual Pet Menu =====");
-            System.out.println("1. Feed Pet");
-            System.out.println("2. Play With Pet");
-            System.out.println("3. Let Pet Sleep");
-            System.out.println("4. Pet Sound");
-            System.out.println("5. Show Status");
-            System.out.println("6. Exit");
+            System.out.println("\n===== PET ADVENTURE =====");
+            System.out.println("1 Explore");
+            System.out.println("2 Battle");
+            System.out.println("3 Pet Sound");
+            System.out.println("4 Show Stats");
+            System.out.println("5 Inventory");
+            System.out.println("6 Exit");
 
             int choice = scanner.nextInt();
 
             switch (choice) {
 
                 case 1:
-                    Food food = new Food("Meat", 20);
-                    owner.feedPet(food);
+                    explore();
                     break;
 
                 case 2:
-                    Activity activity = new Activity("Fetch", 10, 20);
-                    owner.playWithPet(activity);
+                    BattleSystem.fight(pet);
                     break;
 
                 case 3:
-                    owner.letPetSleep();
+                    pet.makeSound();
                     break;
 
                 case 4:
-                    owner.getPet().makeSound();
+                    pet.showStats();
                     break;
 
                 case 5:
-                    owner.showPetStatus();
+                    inventory.showInventory();
                     break;
 
                 case 6:
-                    System.out.println("Goodbye!");
                     return;
-
-                default:
-                    System.out.println("Invalid choice");
             }
+        }
+    }
+
+    private void explore() {
+
+        int event = random.nextInt(3);
+
+        if (event == 0) {
+            System.out.println("Your pet found food!");
+            inventory.addItem("Apple");
+        }
+
+        else if (event == 1) {
+            System.out.println("Enemy encountered!");
+            BattleSystem.fight(pet);
+        }
+
+        else {
+            System.out.println("Your pet discovered treasure!");
+            inventory.addItem("Gold Coin");
         }
     }
 }
