@@ -1,3 +1,4 @@
+package pet;
 public abstract class Pet {
 
     protected String name;

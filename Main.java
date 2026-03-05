@@ -1,5 +1,9 @@
 import java.util.Scanner;
 
+import pet.Cat;
+import pet.Dog;
+import pet.Pet;
+
 public class Main {
 
     public static void main(String[] args) {

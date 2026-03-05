@@ -1,5 +1,7 @@
 import java.util.Scanner;
 
+import items.Food;
+
 public class GameManager {
 
     private Owner owner;

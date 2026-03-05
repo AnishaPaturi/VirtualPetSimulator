@@ -1,3 +1,6 @@
+import items.Food;
+import pet.Pet;
+
 public class Owner {
 
     private String ownerName;
