@@ -72,3 +72,13 @@ button:focus-visible {
   50% { transform: scale(1.5); }
   100% { transform: scale(1); }
 }
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+body {
+  margin: 0;
+}

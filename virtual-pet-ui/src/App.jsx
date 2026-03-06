@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import PetCard from "./components/PetCard";
 import GameMenu from "./components/GameMenu";
 import BattleLog from "./components/BattleLog";
 import Inventory from "./components/Inventory";
 import BattleScreen from "./components/BattleScreen";
-import MapGrid from "./components/MapGrid";
 
 export default function App() {
 
@@ -17,6 +16,10 @@ export default function App() {
     xp: 0
   });
 
+  const [inventory, setInventory] = useState([]);
+
+  const [petPosition, setPetPosition] = useState({ x: 0, y: 0 });
+
   const [enemy, setEnemy] = useState(null);
 
   const [log, setLog] = useState(["Game started"]);
@@ -24,7 +27,45 @@ export default function App() {
   const [levelUp, setLevelUp] = useState(false);
 
   // ----------------------------
-  // EXPLORE EVENT
+  // LOAD GAME ON START
+  // ----------------------------
+
+  useEffect(() => {
+
+    const saved = localStorage.getItem("petGameSave");
+
+    if (saved) {
+
+      const data = JSON.parse(saved);
+
+      setPet(data.pet);
+      setInventory(data.inventory);
+      setPetPosition(data.petPosition);
+
+      setLog(l => [...l, "Save file loaded"]);
+    }
+
+  }, []);
+
+  // ----------------------------
+  // SAVE GAME
+  // ----------------------------
+
+  const saveGame = () => {
+
+    const data = {
+      pet,
+      inventory,
+      petPosition
+    };
+
+    localStorage.setItem("petGameSave", JSON.stringify(data));
+
+    setLog(l => [...l, "Game saved"]);
+  };
+
+  // ----------------------------
+  // EXPLORE
   // ----------------------------
 
   const explore = () => {
@@ -39,8 +80,10 @@ export default function App() {
 
     setLog(prev => [...prev, event.text]);
 
-    if (event.type === "enemy") {
-      spawnEnemy();
+    if (event.type === "enemy") spawnEnemy();
+
+    if (event.type === "item") {
+      setInventory(i => [...i, "Apple"]);
     }
   };
 
@@ -102,7 +145,10 @@ export default function App() {
         const newXP = prev.xp + 20;
 
         if (newXP >= 50) {
+
           setLevelUp(true);
+
+          setTimeout(() => setLevelUp(false), 2000);
 
           return {
             ...prev,
@@ -112,75 +158,38 @@ export default function App() {
           };
         }
 
-        return {
-          ...prev,
-          xp: newXP
-        };
-      });
+        return { ...prev, xp: newXP };
 
-      setTimeout(() => setLevelUp(false), 2000);
+      });
     }
   };
 
   // ----------------------------
-  // BASIC BATTLE BUTTON
+  // USE ITEM
   // ----------------------------
 
-  const battle = () => {
-    spawnEnemy();
-  };
+  const useItem = (item) => {
 
-    // ----------------------------
-    // MAP GRID
-    // ----------------------------
+    if (item === "Apple") {
 
-  const [grid] = useState([
-    ["", "", "", ""],
-    ["", "👹", "", ""],
-    ["", "", "💰", ""],
-    ["", "", "", ""]
-  ]);
+      setPet(prev => ({
+        ...prev,
+        health: Math.min(prev.health + 20, 100)
+      }));
 
-  const [petPosition, setPetPosition] = useState({
-    x: 0,
-    y: 0
-  });
-
-  const movePet = (dx, dy) => {
-
-    setPetPosition(prev => {
-
-      const newX = prev.x + dx;
-      const newY = prev.y + dy;
-
-      if (newX < 0 || newY < 0 || newX >= 4 || newY >= 4)
-        return prev;
-
-      const tile = grid[newY][newX];
-
-      if (tile === "👹") {
-        setLog(l => [...l, "Enemy encountered!"]);
-        spawnEnemy();
-      }
-
-      if (tile === "💰") {
-        setLog(l => [...l, "Found treasure!"]);
-      }
-
-      return { x: newX, y: newY };
-    });
+      setLog(l => [...l, "Apple healed 20 HP"]);
+    }
 
   };
-
 
   return (
-    <div style={{ padding: 40, fontFamily: "sans-serif" }}>
+    <div className="bg-green-200 min-h-screen p-8 font-[Press_Start_2P]">
 
-      <h1>🐾 Virtual Pet Adventure</h1>
+      <h1 className="text-2xl mb-6">🐾 Virtual Pet Adventure</h1>
 
       <PetCard pet={pet} />
 
-      <GameMenu explore={explore} battle={battle} />
+      <GameMenu explore={explore} battle={spawnEnemy} save={saveGame} />
 
       {enemy && (
         <BattleScreen
@@ -190,32 +199,16 @@ export default function App() {
         />
       )}
 
-      <Inventory />
+      <Inventory inventory={inventory} useItem={useItem} />
 
       <BattleLog log={log} />
 
       {levelUp && (
-        <div
-          style={{
-            position: "fixed",
-            top: "40%",
-            left: "40%",
-            fontSize: "40px",
-            color: "gold",
-            fontWeight: "bold"
-          }}
-        >
+        <div className="fixed top-1/2 left-1/2 text-yellow-400 text-3xl">
           ⭐ LEVEL UP!
         </div>
       )}
 
-      <h2>🌍 World Map</h2>
-
-      <MapGrid
-        grid={grid}
-        petPosition={petPosition}
-        movePet={movePet}
-      />
     </div>
   );
 }
