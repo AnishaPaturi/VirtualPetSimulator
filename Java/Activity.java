@@ -1,3 +1,4 @@
+package Java;
 public class Activity {
 
     private String activityName;
