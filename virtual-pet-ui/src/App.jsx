@@ -4,6 +4,7 @@ import GameMenu from "./components/GameMenu";
 import BattleLog from "./components/BattleLog";
 import Inventory from "./components/Inventory";
 import BattleScreen from "./components/BattleScreen";
+import MapGrid from "./components/MapGrid";
 
 export default function App() {
 
@@ -129,6 +130,49 @@ export default function App() {
     spawnEnemy();
   };
 
+    // ----------------------------
+    // MAP GRID
+    // ----------------------------
+
+  const [grid] = useState([
+    ["", "", "", ""],
+    ["", "👹", "", ""],
+    ["", "", "💰", ""],
+    ["", "", "", ""]
+  ]);
+
+  const [petPosition, setPetPosition] = useState({
+    x: 0,
+    y: 0
+  });
+
+  const movePet = (dx, dy) => {
+
+    setPetPosition(prev => {
+
+      const newX = prev.x + dx;
+      const newY = prev.y + dy;
+
+      if (newX < 0 || newY < 0 || newX >= 4 || newY >= 4)
+        return prev;
+
+      const tile = grid[newY][newX];
+
+      if (tile === "👹") {
+        setLog(l => [...l, "Enemy encountered!"]);
+        spawnEnemy();
+      }
+
+      if (tile === "💰") {
+        setLog(l => [...l, "Found treasure!"]);
+      }
+
+      return { x: newX, y: newY };
+    });
+
+  };
+
+
   return (
     <div style={{ padding: 40, fontFamily: "sans-serif" }}>
 
@@ -165,6 +209,13 @@ export default function App() {
         </div>
       )}
 
+      <h2>🌍 World Map</h2>
+
+      <MapGrid
+        grid={grid}
+        petPosition={petPosition}
+        movePet={movePet}
+      />
     </div>
   );
 }
